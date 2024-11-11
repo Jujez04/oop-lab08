@@ -135,6 +135,24 @@ class TestDeathNote {
 
     @Test
     void assertDetails() {
-        
+        assertThrows(NullPointerException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+                deathNote.writeDetails("Stabbed by Verdi in street 42");
+            }
+        });
+        final String johnDoe = "John Doe";
+        deathNote.writeName(johnDoe);
+        assertEquals("", deathNote.getDeathDetails(johnDoe));
+        deathNote.writeDetails("ran for too long");
+        final String janeDoe = "Jane Doe";
+        deathNote.writeName(janeDoe);
+        try {
+            Thread.sleep(6100L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertFalse(deathNote.writeDetails("due to illness"));
+        assertEquals("", deathNote.getDeathDetails(janeDoe));
     }
 }

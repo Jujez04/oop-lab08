@@ -31,6 +31,7 @@ public class DeathNoteImplementation implements DeathNote{
         }
         blackList.put(name, new Death());
         lastNameWritten = name;
+        lastDeath = blackList.get(name);
     }
 
     @Override
@@ -49,8 +50,8 @@ public class DeathNoteImplementation implements DeathNote{
 
     @Override
     public boolean writeDetails(String details) {
-        lastDeath.setDetails(details);
         if(System.currentTimeMillis() - lastDeath.getStartTimeCause() < LIMIT_DETAILS) {
+            lastDeath.setDetails(details);
             blackList.put(lastNameWritten, lastDeath);
             return true;
         }
@@ -59,7 +60,7 @@ public class DeathNoteImplementation implements DeathNote{
 
     @Override
     public String getDeathCause(String name) {
-        return blackList.get(name).getDeathCause();
+        return blackList.get(name).getCause();
     }
 
     @Override
@@ -94,7 +95,7 @@ public class DeathNoteImplementation implements DeathNote{
             this(STD_DEATH, System.currentTimeMillis());
         }
 
-        public String getDeathCause() {
+        public String getCause() {
             return this.deathCause;
         }
         
