@@ -14,7 +14,7 @@ import java.util.*;
 public final class DrawNumberControllerImpl implements DrawNumberController {
 
     private final DrawNumber model;
-    private DrawNumberView view;
+    //private DrawNumberView view;
     private final List<DrawNumberView> multipleViews;
 
     /**
