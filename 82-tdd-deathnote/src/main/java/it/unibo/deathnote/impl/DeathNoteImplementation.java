@@ -5,7 +5,11 @@ import it.unibo.deathnote.api.DeathNote;
 
 public class DeathNoteImplementation implements DeathNote{
 
-    private final Map<String, String> blackList = new HashMap<>();
+    private final Map<String, Death> blackList = new HashMap<>();
+    private final static long LIMIT_CAUSE = 40L;
+    private final static long LIMIT_DETAILS = 6040L;
+    private String lastNameWritten;
+    private Death lastDeath;
 
     @Override
     public String getRule(int ruleNumber) {
@@ -20,7 +24,8 @@ public class DeathNoteImplementation implements DeathNote{
         if(name.isBlank()) {
             throw new NullPointerException();
         }
-        blackList.put(name, "");
+        blackList.put(name, new Death());
+        lastNameWritten = name;
     }
 
     @Override
@@ -29,39 +34,93 @@ public class DeathNoteImplementation implements DeathNote{
             throw new IllegalStateException();
         }
         long startTime = System.currentTimeMillis();
-        long elapsedTime = 0L;
-        for(String key : blackList.keySet()){
-            if(blackList.get(key).isBlank()){
-                blackList.put(key, cause);
-                return true;
-            }
+        final Death newDeath = new Death(cause);
+        newDeath.setTimeElapsed(System.currentTimeMillis() - startTime);
+        if(newDeath.getTimeLapse() < LIMIT_CAUSE) {
+            blackList.put(lastNameWritten, newDeath);
+            lastDeath = newDeath;
+            return true;
         }
         return false;
     }
 
     @Override
     public boolean writeDetails(String details) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'writeDetails'");
+        long startTime = System.currentTimeMillis();
+        lastDeath.setDetails(details);
+        lastDeath.setTimeElapsed(System.currentTimeMillis() - startTime);
+        if(lastDeath.getTimeLapse() < LIMIT_DETAILS) {
+            blackList.put(lastNameWritten, lastDeath);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public String getDeathCause(String name) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getDeathCause'");
+        return blackList.get(name).getDeathCause();
     }
 
     @Override
     public String getDeathDetails(String name) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getDeathDetails'");
+        return blackList.get(name).getDetails();
     }
 
     @Override
     public boolean isNameWritten(String name) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isNameWritten'");
+        return blackList.containsKey(name);
     }
 
+    private class Death {
+        private final static String STD_DEATH = "Earth Attack";
+        private final static String NO_DETAILS = "";
+
+        private String deathCause;
+        private String detailsDeath;
+        private long timeLapse;
+        
+        Death(String deathCause, String details, long timeElapsed) {
+            this.deathCause = deathCause;
+            this.timeLapse = timeElapsed;
+            this.detailsDeath = details;
+        }
+
+        Death(String deathCause, long timeElapsed) {
+            this(deathCause, NO_DETAILS , timeElapsed);
+        }
+
+        Death(String deathCause) {
+            this(deathCause, 0L);
+        }
+
+        Death() {
+            this(STD_DEATH);
+        }
+
+        public String getDeathCause() {
+            return this.deathCause;
+        }
+        
+        public long getTimeLapse() {
+            return this.timeLapse;
+        }
+
+        public String getDetails() {
+            return this.detailsDeath;
+        }
+
+        public void setTimeElapsed(long lapse) {
+            this.timeLapse = lapse;
+        }
+        
+        public void setDetails(String details) {
+            this.detailsDeath = details;
+        }
+        
+        @SuppressWarnings("unused")
+        public void setDeathCause(String cause) {
+            this.deathCause = cause;
+        }
+    }
     
 }
