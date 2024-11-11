@@ -11,9 +11,14 @@ public class DeathNoteImplementation implements DeathNote{
     private String lastNameWritten;
     private Death lastDeath;
 
+
+    private Death getDeath(String name) {
+        return blackList.get(name);
+    }
+
     @Override
     public String getRule(int ruleNumber) {
-        if(ruleNumber < 1 && ruleNumber > RULES.size()) {
+        if(ruleNumber < 1 || ruleNumber > RULES.size()) {
             throw new IllegalArgumentException();
         }
         return RULES.get(ruleNumber - 1);
@@ -33,10 +38,8 @@ public class DeathNoteImplementation implements DeathNote{
         if(cause.isEmpty() || blackList.isEmpty()) {
             throw new IllegalStateException();
         }
-        long startTime = System.currentTimeMillis();
-        final Death newDeath = new Death(cause);
-        newDeath.setTimeElapsed(System.currentTimeMillis() - startTime);
-        if(newDeath.getTimeLapse() < LIMIT_CAUSE) {
+        final Death newDeath = new Death(cause, getDeath(lastNameWritten).getStartTimeCause());
+        if((System.currentTimeMillis() - newDeath.getStartTimeCause()) < LIMIT_CAUSE) {
             blackList.put(lastNameWritten, newDeath);
             lastDeath = newDeath;
             return true;
@@ -46,10 +49,8 @@ public class DeathNoteImplementation implements DeathNote{
 
     @Override
     public boolean writeDetails(String details) {
-        long startTime = System.currentTimeMillis();
         lastDeath.setDetails(details);
-        lastDeath.setTimeElapsed(System.currentTimeMillis() - startTime);
-        if(lastDeath.getTimeLapse() < LIMIT_DETAILS) {
+        if(System.currentTimeMillis() - lastDeath.getStartTimeCause() < LIMIT_DETAILS) {
             blackList.put(lastNameWritten, lastDeath);
             return true;
         }
@@ -72,16 +73,16 @@ public class DeathNoteImplementation implements DeathNote{
     }
 
     private class Death {
-        private final static String STD_DEATH = "Earth Attack";
+        private final static String STD_DEATH = "Heart attack";
         private final static String NO_DETAILS = "";
 
         private String deathCause;
         private String detailsDeath;
-        private long timeLapse;
+        private long startTimeCause;
         
         Death(String deathCause, String details, long timeElapsed) {
             this.deathCause = deathCause;
-            this.timeLapse = timeElapsed;
+            this.startTimeCause = timeElapsed;
             this.detailsDeath = details;
         }
 
@@ -89,20 +90,16 @@ public class DeathNoteImplementation implements DeathNote{
             this(deathCause, NO_DETAILS , timeElapsed);
         }
 
-        Death(String deathCause) {
-            this(deathCause, 0L);
-        }
-
         Death() {
-            this(STD_DEATH);
+            this(STD_DEATH, System.currentTimeMillis());
         }
 
         public String getDeathCause() {
             return this.deathCause;
         }
         
-        public long getTimeLapse() {
-            return this.timeLapse;
+        public long getStartTimeCause() {
+            return this.startTimeCause;
         }
 
         public String getDetails() {
@@ -110,13 +107,13 @@ public class DeathNoteImplementation implements DeathNote{
         }
 
         public void setTimeElapsed(long lapse) {
-            this.timeLapse = lapse;
+            this.startTimeCause = lapse;
         }
         
         public void setDetails(String details) {
             this.detailsDeath = details;
         }
-        
+
         @SuppressWarnings("unused")
         public void setDeathCause(String cause) {
             this.deathCause = cause;
