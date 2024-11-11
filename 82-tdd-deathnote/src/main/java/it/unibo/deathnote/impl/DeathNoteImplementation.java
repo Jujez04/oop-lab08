@@ -36,7 +36,7 @@ public class DeathNoteImplementation implements DeathNote{
 
     @Override
     public boolean writeDeathCause(String cause) {
-        if(cause.isEmpty() || blackList.isEmpty()) {
+        if(cause.isBlank() || blackList.isEmpty()) {
             throw new IllegalStateException();
         }
         final Death newDeath = new Death(cause, getDeath(lastNameWritten).getStartTimeCause());
@@ -87,8 +87,8 @@ public class DeathNoteImplementation implements DeathNote{
             this.detailsDeath = details;
         }
 
-        Death(String deathCause, long timeElapsed) {
-            this(deathCause, NO_DETAILS , timeElapsed);
+        Death(String deathCause, long startingTime) {
+            this(deathCause, NO_DETAILS , startingTime);
         }
 
         Death() {
@@ -106,18 +106,9 @@ public class DeathNoteImplementation implements DeathNote{
         public String getDetails() {
             return this.detailsDeath;
         }
-
-        public void setTimeElapsed(long lapse) {
-            this.startTimeCause = lapse;
-        }
         
         public void setDetails(String details) {
             this.detailsDeath = details;
-        }
-
-        @SuppressWarnings("unused")
-        public void setDeathCause(String cause) {
-            this.deathCause = cause;
         }
     }
     
