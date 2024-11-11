@@ -41,7 +41,6 @@ public class MiniGUI {
         canvas.add(panel, BorderLayout.CENTER);
         panel.add(write);
         //Part 2
-        
         final JTextField textField = new JTextField(RESULT);
         canvas.add(textField, BorderLayout.NORTH);
         frame.setContentPane(canvas);
@@ -52,7 +51,9 @@ public class MiniGUI {
         write.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                textField.setText(RESULT + ": "+ randomGenerator.nextInt());
+                final String newResult = RESULT + ": " + randomGenerator.nextInt();
+                textField.setText(newResult);
+                System.out.println(newResult);
             }
         });
         
