@@ -2,6 +2,7 @@ package it.unibo.mvc;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 //import it.unibo.mvc.api.DrawNumber;
 import it.unibo.mvc.api.DrawNumberController;
@@ -40,14 +41,13 @@ public final class LaunchApp {
         app.addView(new DrawNumberStdoutView());
         */
         try {
-            final Class<?> cls1 = Class.forName("it.unibo.mvc.view.DrawNumberStdoutView");
-            final Class<?> cls2 = Class.forName("it.unibo.mvc.view.DrawNumberSwingView");
-            final Constructor<?> construct1 = cls1.getConstructor(); 
-            final Constructor<?> construct2 = cls2.getConstructor();
-            for(int i = 0 ; i < 3; i++) {
-                app.addView( (DrawNumberView)construct1.newInstance());
-                app.addView( (DrawNumberView)construct2.newInstance());
-            }
+            for(String typeView : List.of("Stdout", "Swing")) {
+                final Class<?> cls = Class.forName("it.unibo.mvc.view.DrawNumber"+ typeView +"View");
+                final Constructor<?> construct = cls.getConstructor(); 
+                for(int i = 0 ; i < 3; i++) {
+                    app.addView( (DrawNumberView)construct.newInstance());
+                }
+            }  
         } catch (ClassNotFoundException e) {
             System.out.println(e.getMessage());
         } catch (NoSuchMethodException | SecurityException e) {
